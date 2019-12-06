@@ -1,4 +1,5 @@
 resource "aws_instance" "wordpress" {
-  ami           = "ami-009281f19e36b3eb9"
+  ami           = "${var.ami["amazon-linux2-x86"]}"
   instance_type = "t2.micro"
+  key_name      = "webserver"
 }
