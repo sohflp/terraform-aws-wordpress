@@ -1,3 +1,12 @@
+variable "environment_name" {
+}
+
+variable "username" {
+}
+
+variable "password" {
+}
+
 # AMI - Amazon Linux 2 AMI (HVM) (64-bit x86)
 variable "ami" {
     type    = "map"
