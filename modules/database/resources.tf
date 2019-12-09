@@ -1,6 +1,4 @@
 resource "aws_db_instance" "wp-mysql" {
-  identifier             = "wp-terraform-db"
-
   name                   = "${var.db_schema}"
   username               = "${var.db_username}"
   password               = "${var.db_password}"
