@@ -1,3 +1,3 @@
-output "endpoint" {
+output "db_endpoint" {
   value = "${aws_db_instance.wp-mysql.endpoint}"
 }

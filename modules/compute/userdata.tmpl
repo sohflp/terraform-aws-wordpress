@@ -1,9 +1,18 @@
 #!/bin/bash
 sudo su
 yum update -y
-yum install httpd -y
+yum install httpd php php-mysql -y
 cd /var/www/html
-echo "WebServer Felipe" > index.html
 echo "Health" > health.html
+wget https://wordpress.org/wordpress-5.1.1.tar.gz
+tar -xzf wordpress-5.1.1.tar.gz
+cp -r wordpress/* /var/www/html/
+rm -rf wordpress
+rm -rf wordpress-5.1.1.tar.gz
+cp wp-config-sample.php wp-config.php
+sed -i "s/database_name_here/WP_DB_NAME/" wp-config.php
+sed -i "s/username_here/WP_DB_USER/" wp-config.php
+sed -i "s/password_here/WP_DB_PASS/" wp-config.php
+sed -i "s/localhost/WP_DB_HOST/" wp-config.php
 service httpd start
 chkconfig httpd on

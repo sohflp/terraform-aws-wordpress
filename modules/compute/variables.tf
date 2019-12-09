@@ -13,3 +13,15 @@ variable "ec2_key" {
 
 variable "ec2_ami" {
 }
+
+variable "db_username" {
+}
+
+variable "db_password" {
+}
+
+variable "db_schema" {
+}
+
+variable "db_endpoint" {
+}

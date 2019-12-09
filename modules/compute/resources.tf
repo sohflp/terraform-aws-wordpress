@@ -1,40 +1,21 @@
 #############################################
-#   EC2, LAUNCH CONFIG and AUTO SCALING
+#   LAUNCH CONFIG and AUTO SCALING
 #############################################
 
-resource "aws_launch_template" "wp-launchconfig" {
+resource "aws_launch_configuration" "wp-launchconfig" {
   name = "wordpress_launchconfig"
 
-  block_device_mappings {
-    device_name = "/dev/xvda"
-
-    ebs {
-      volume_size = 8
-    }
+  root_block_device {
+    volume_type = "gp2"
+    volume_size = 8
   }
 
-  disable_api_termination = false
   instance_type           = "t2.micro"
-#  image_id                = data.aws_ami.base_image.id
   image_id                = "${var.ec2_ami["amazon-linux2-x86"]}"
   key_name                = "${var.ec2_key}"
-  vpc_security_group_ids  = ["${aws_security_group.sg-wp-ec2.id}"]
+  security_groups         = ["${aws_security_group.sg-wp-ec2.id}"]
 
-  user_data = base64encode(data.template_file.userdata.rendered)
-
-  tags = {
-    Terraform   = "true"
-    Environment = "${var.environment_name}"
-  }
-
-  tag_specifications {
-    resource_type = "instance"
-
-    tags = {
-      Terraform   = "true"
-      Environment = "${var.environment_name}"
-    }
-  }
+  user_data_base64 = base64encode(data.template_file.userdata.rendered)
 }
 
 resource "aws_autoscaling_group" "wp-autoscaling" {
@@ -44,23 +25,14 @@ resource "aws_autoscaling_group" "wp-autoscaling" {
   desired_capacity          = 1
   max_size                  = 2
   min_size                  = 1
-
-  launch_template {
-    id      = "${aws_launch_template.wp-launchconfig.id}"
-#    version = "$Latest"
-  }
+  launch_configuration      = "${aws_launch_configuration.wp-launchconfig.name}"
 
   tags = [
-    {
-      key                 = "Terraform"
-      value               = "true"
-      propagate_at_launch = true
-    },
     {
       key                 = "Environment"
       value               = "${var.environment_name}"
       propagate_at_launch = true
-    },
+    }
   ]
 }
 
@@ -78,7 +50,7 @@ resource "aws_autoscaling_policy" "wp-asgpolicy" {
 
 resource "aws_security_group" "sg-wp-alb" {
   name   = "WordPress - ALB (Public)"
-#  vpc_id = var.vpc_id
+  vpc_id = "${var.vpc_id}"
 
   ingress {
     # TLS (change to whatever ports you need)
@@ -99,14 +71,13 @@ resource "aws_security_group" "sg-wp-alb" {
   }
 
   tags = {
-    Terraform   = "true"
     Environment = "${var.environment_name}"
   }
 }
 
 resource "aws_security_group" "sg-wp-ec2" {
   name   = "WordPress - ALB to EC2"
-#  vpc_id = var.vpc_id
+  vpc_id = "${var.vpc_id}"
 
   ingress {
     # TLS (change to whatever ports you need)
@@ -138,7 +109,6 @@ resource "aws_security_group" "sg-wp-ec2" {
   }
 
   tags = {
-    Terraform   = "true"
     Environment = "${var.environment_name}"
   }
 }
@@ -155,7 +125,6 @@ resource "aws_alb" "wp-alb" {
   internal           = false
 
   tags = {
-    Terraform   = "true"
     Environment = "${var.environment_name}"
   }
 }
@@ -175,7 +144,6 @@ resource "aws_alb_target_group" "wp-targetgroup" {
   }
 
   tags = {
-    Terraform   = "true"
     Environment = "${var.environment_name}"
   }
 }

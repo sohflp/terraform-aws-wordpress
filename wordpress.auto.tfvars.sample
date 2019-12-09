@@ -1,0 +1,14 @@
+# Tags (Resource Groups)
+environment_name = "???"
+
+# Network
+vpc_id = "???"
+vpc_public_subnets = ["???","???"]
+
+# Compute
+ec2_key = "???"
+
+# Database
+db_schema   = "???"
+db_username = "???"
+db_password = "???"
