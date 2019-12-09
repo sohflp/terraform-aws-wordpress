@@ -1,0 +1,9 @@
+#!/bin/bash
+sudo su
+yum update -y
+yum install httpd -y
+cd /var/www/html
+echo "WebServer Felipe" > index.html
+echo "Health" > health.html
+service httpd start
+chkconfig httpd on

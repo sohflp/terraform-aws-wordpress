@@ -1,5 +1,6 @@
-resource "aws_db_instance" "mysql" {
-  name                  = "wordpress_db"
+resource "aws_db_instance" "wp-mysql" {
+  name                  = "wordpress_database"
+  identifier            = "wp-terraform-db"
   
   allocated_storage     = 20
   max_allocated_storage = 100
@@ -10,8 +11,8 @@ resource "aws_db_instance" "mysql" {
   instance_class        = "db.t2.micro"
   parameter_group_name  = "default.mysql5.7"
 
-  username              = "${var.username}"
-  password              = "${var.password}"
+  username              = "${var.db_username}"
+  password              = "${var.db_password}"
 
   skip_final_snapshot   = true
 }

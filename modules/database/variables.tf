@@ -1,8 +1,8 @@
 variable "environment_name" {
 }
 
-variable "username" {
+variable "db_username" {
 }
 
-variable "password" {
+variable "db_password" {
 }
