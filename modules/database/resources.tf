@@ -17,6 +17,10 @@ resource "aws_db_instance" "wp-mysql" {
   vpc_security_group_ids = ["${aws_security_group.sg-wp-rds.id}"]
 
   skip_final_snapshot    = true
+
+  tags = {
+    Environment = "${var.environment_name}"
+  }
 }
 
 resource "aws_security_group" "sg-wp-rds" {

@@ -28,10 +28,3 @@ variable "db_password" {
 
 variable "db_schema" {
 }
-
-#variable "region" {
-#  type = "string"
-#  default = "us-east-1"
-#}
-#
-#"${lookup(var.ami, var.region)}"
