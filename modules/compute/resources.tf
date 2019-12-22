@@ -13,15 +13,15 @@ resource "aws_launch_configuration" "wp-launchconfig" {
   instance_type           = "t2.micro"
   image_id                = "${var.ec2_ami["amazon-linux2-x86"]}"
   key_name                = "${var.ec2_key}"
-  security_groups         = ["${aws_security_group.sg-wp-ec2.id}"]
+  security_groups         = ["${var.ec2_security_group}"]
 
-  user_data_base64 = base64encode(data.template_file.userdata.rendered)
+  user_data_base64 = "${base64encode(data.template_file.userdata.rendered)}"
 }
 
 resource "aws_autoscaling_group" "wp-autoscaling" {
   health_check_type         = "EC2"
   health_check_grace_period = 300
-  vpc_zone_identifier       = "${var.vpc_public_subnets}"
+  vpc_zone_identifier       = "${var.vpc_subnet_group}"
   desired_capacity          = 2
   max_size                  = 3
   min_size                  = 2
@@ -45,83 +45,14 @@ resource "aws_autoscaling_policy" "wp-asgpolicy" {
 }
 
 #############################################
-#   SECURITY GROUPS
-#############################################
-
-resource "aws_security_group" "sg-wp-alb" {
-  name   = "WordPress - ALB (Public)"
-  vpc_id = "${var.vpc_id}"
-
-  ingress {
-    # TLS (change to whatever ports you need)
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
-
-    # Please restrict your ingress to only necessary IPs and ports.
-    # Opening to 0.0.0.0/0 can lead to security vulnerabilities.
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = -1
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Environment = "${var.environment_name}"
-  }
-}
-
-resource "aws_security_group" "sg-wp-ec2" {
-  name   = "WordPress - ALB to EC2"
-  vpc_id = "${var.vpc_id}"
-
-  ingress {
-    # TLS (change to whatever ports you need)
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
-
-    # Please restrict your ingress to only necessary IPs and ports.
-    # Opening to 0.0.0.0/0 can lead to security vulnerabilities.
-    security_groups = ["${aws_security_group.sg-wp-alb.id}"]
-  }
-
-  ingress {
-    # TLS (change to whatever ports you need)
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
-
-    # Please restrict your ingress to only necessary IPs and ports.
-    # Opening to 0.0.0.0/0 can lead to security vulnerabilities.
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = -1
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Environment = "${var.environment_name}"
-  }
-}
-
-#############################################
 #   ALB, TARGET GROUPS and LISTENERS
 #############################################
 
 resource "aws_alb" "wp-alb" {
   name               = "wordpress-alb"
   load_balancer_type = "application"
-  subnets            = "${var.vpc_public_subnets}"
-  security_groups    = ["${aws_security_group.sg-wp-alb.id}"]
+  subnets            = "${var.vpc_subnet_group}"
+  security_groups    = ["${var.alb_security_group}"]
   internal           = false
 
   tags = {

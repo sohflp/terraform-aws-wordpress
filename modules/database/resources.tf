@@ -12,7 +12,8 @@ resource "aws_db_instance" "wp-mysql" {
   instance_class         = "db.t2.micro"
   parameter_group_name   = "default.mysql5.7"
 
-  vpc_security_group_ids = ["${aws_security_group.sg-wp-rds.id}"]
+  db_subnet_group_name   = "${aws_db_subnet_group.default.id}"
+  vpc_security_group_ids = ["${var.rds_security_group}"]
 
   skip_final_snapshot    = true
 
@@ -21,29 +22,12 @@ resource "aws_db_instance" "wp-mysql" {
   }
 }
 
-resource "aws_security_group" "sg-wp-rds" {
-  name   = "WordPress - EC2 to RDS"
-  vpc_id = "${var.vpc_id}"
-
-  ingress {
-    # TLS (change to whatever ports you need)
-    from_port = 3306
-    to_port   = 3306
-    protocol  = "tcp"
-
-    # Please restrict your ingress to only necessary IPs and ports.
-    # Opening to 0.0.0.0/0 can lead to security vulnerabilities.
-    security_groups = ["${var.ec2_security_group}"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = -1
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_db_subnet_group" "default" {
+  name       = "main"
+  subnet_ids = "${var.vpc_subnet_group}"
 
   tags = {
+    Name        = "DB Subnet Group",
     Environment = "${var.environment_name}"
   }
 }

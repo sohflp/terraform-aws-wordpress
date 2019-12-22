@@ -4,8 +4,14 @@ variable "environment_name" {
 variable "vpc_id" {
 }
 
-variable "vpc_public_subnets" {
+variable "vpc_subnet_group" {
     type = list(string)
+}
+
+variable "alb_security_group" {
+}
+
+variable "ec2_security_group" {
 }
 
 variable "ec2_key" {
