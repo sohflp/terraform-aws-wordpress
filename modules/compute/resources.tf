@@ -21,7 +21,7 @@ resource "aws_launch_configuration" "wp-launchconfig" {
 resource "aws_autoscaling_group" "wp-autoscaling" {
   health_check_type         = "EC2"
   health_check_grace_period = 300
-  vpc_zone_identifier       = "${var.vpc_subnet_group}"
+  vpc_zone_identifier       = "${var.vpc_app_subnet_ids}"
   desired_capacity          = 2
   max_size                  = 3
   min_size                  = 2
@@ -51,7 +51,7 @@ resource "aws_autoscaling_policy" "wp-asgpolicy" {
 resource "aws_alb" "wp-alb" {
   name               = "wordpress-alb"
   load_balancer_type = "application"
-  subnets            = "${var.vpc_subnet_group}"
+  subnets            = "${var.vpc_public_subnet_ids}"
   security_groups    = ["${var.alb_security_group}"]
   internal           = false
 
@@ -101,8 +101,9 @@ resource "aws_alb_listener_rule" "wp-alb-listener_rule" {
   }
 
   condition {
-    field  = "path-pattern"
-    values = ["/"]
+    path_pattern {
+      values = ["/"]
+    }
   }
 }
 

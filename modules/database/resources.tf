@@ -12,7 +12,7 @@ resource "aws_db_instance" "wp-mysql" {
   instance_class         = "db.t2.micro"
   parameter_group_name   = "default.mysql5.7"
 
-  db_subnet_group_name   = "${aws_db_subnet_group.default.id}"
+  db_subnet_group_name   = "${aws_db_subnet_group.main.id}"
   vpc_security_group_ids = ["${var.rds_security_group}"]
 
   skip_final_snapshot    = true
@@ -22,9 +22,9 @@ resource "aws_db_instance" "wp-mysql" {
   }
 }
 
-resource "aws_db_subnet_group" "default" {
+resource "aws_db_subnet_group" "main" {
   name       = "main"
-  subnet_ids = "${var.vpc_subnet_group}"
+  subnet_ids = "${var.vpc_subnet_ids}"
 
   tags = {
     Name        = "DB Subnet Group",

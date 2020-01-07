@@ -4,7 +4,7 @@ variable "environment_name" {
 variable "vpc_id" {
 }
 
-variable "vpc_subnet_group" {
+variable "vpc_subnet_ids" {
     type = list(string)
 }
 
